@@ -63,7 +63,7 @@ def drawGrid(surface: pygame.display, maxSz: [int, int], sz: int):
                      (maxSz[0], maxSz[1] - Conf["Mov_border_offset"]))
 
 
-def pixOnGrid(surface, p: [int, int], sz: int, org: [int, int], maxSz: [int, int], col: [int, int, int]):
+def pixOnGrid(surface: pygame.display, p: [int, int], sz: int, org: [int, int], maxSz: [int, int], col: [int, int, int]):
     px = p[0]
     py = p[1]
     if (px + org[0]) * sz > maxSz[0] or org[0] + px < 0:
@@ -71,32 +71,6 @@ def pixOnGrid(surface, p: [int, int], sz: int, org: [int, int], maxSz: [int, int
     if (py + org[1]) * sz > maxSz[1] or org[1] + py < 0:
         return
     pygame.draw.rect(surface, col, ((px + org[0]) * sz, (py + org[1]) * sz, sz - 1, sz - 1))
-
-
-def absPos2rel(x: int, y: int, centerM: [int, int]) -> [int, int]:
-    return centerM[0] + x, centerM[1] + y
-
-
-def getPosTrans(c: [int, int]):
-    def absPos2relM(x: [int, int]) -> [int, int]:
-        return c[0] + x[0], c[1] + x[1]
-
-    return absPos2relM
-
-
-def getPosTrans2abs(c: [int, int]):
-    def relMPos2abs(x: [int, int]) -> [int, int]:
-        return c[0] - x[0], c[1] - x[1]
-
-    return relMPos2abs
-
-
-def toAria(listMap, aries):
-    for x in range(len(listMap)):
-        try:
-            aries[listMap[x][0], listMap[x][1]] = 1
-        except:
-            pass
 
 
 def drawAriea(aria, surface, cellsize, orgM, maxSz, ux, uy):
