@@ -1,0 +1,12 @@
+{
+"World_xy": (120, 90),
+ "Mov_fps_div_cell_size": 50,
+ "World_fps_cap": 2,
+ "BG_color": (20, 20, 30),
+ "Cell_color": (255, 255, 255),
+ "Mov_border_color": (180, 50, 180),
+ "Mov_border_offset": 30,
+ "Border_color": (50, 50, 80),
+ "Init_cell_size": 8,
+ "Map_data": "Maps/map"
+ }

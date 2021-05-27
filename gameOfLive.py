@@ -4,6 +4,18 @@ import numpy as np
 import pickle
 import pygame
 
+Conf_default = {"World_xy": (120, 90),
+                "Mov_fps_div_cell_size": 50,
+                "World_fps_cap": 2,
+                "BG_color": (20, 20, 30),
+                "Cell_color": (255, 255, 255),
+                "Mov_border_color": (180, 50, 180),
+                "Mov_border_offset": 30,
+                "Border_color": (50, 50, 80),
+                "Init_cell_size": 8,
+                "Map_data": "Maps/map"
+                }
+
 
 def getCond(x: int, y: int, Area: np.array) -> [int, int, int]:
     cell = [Area[x - 1][y + 1], Area[x][y + 1], Area[x + 1][y + 1],
@@ -35,17 +47,20 @@ def genArea(x: int, y: int) -> np.array:
 
 def drawGrid(surface: pygame.display, maxSz: [int, int], sz: int):
     for ix in range(0, maxSz[0], sz):
-        pygame.draw.line(surface, (50, 50, 80), (ix, 0), (ix, maxSz[1]))
+        pygame.draw.line(surface, Conf["Border_color"], (ix, 0), (ix, maxSz[1]))
 
-    pygame.draw.line(surface, (180, 50, 180), (30, 0), (30, maxSz[1]))
-    pygame.draw.line(surface, (180, 50, 180), (maxSz[0]-30, 0), (maxSz[0]-30, maxSz[1]))
+    pygame.draw.line(surface, Conf["Mov_border_color"], (Conf["Mov_border_offset"], 0),
+                     (Conf["Mov_border_offset"], maxSz[1]))
+    pygame.draw.line(surface, Conf["Mov_border_color"], (maxSz[0] - Conf["Mov_border_offset"], 0),
+                     (maxSz[0] - Conf["Mov_border_offset"], maxSz[1]))
 
     for iy in range(0, maxSz[1], sz):
-        pygame.draw.line(surface, (50, 50, 80), (0, iy), (maxSz[0], iy))
+        pygame.draw.line(surface, Conf["Border_color"], (0, iy), (maxSz[0], iy))
 
-    pygame.draw.line(surface, (180, 50, 180), (0, 30), (maxSz[0], 30))
-    pygame.draw.line(surface, (180, 50, 180), (0, maxSz[1]-30), (maxSz[0], maxSz[1]-30))
-
+    pygame.draw.line(surface, Conf["Mov_border_color"], (0, Conf["Mov_border_offset"]),
+                     (maxSz[0], Conf["Mov_border_offset"]))
+    pygame.draw.line(surface, Conf["Mov_border_color"], (0, maxSz[1] - Conf["Mov_border_offset"]),
+                     (maxSz[0], maxSz[1] - Conf["Mov_border_offset"]))
 
 
 def pixOnGrid(surface, p: [int, int], sz: int, org: [int, int], maxSz: [int, int], col: [int, int, int]):
@@ -89,7 +104,7 @@ def drawAriea(aria, surface, cellsize, orgM, maxSz, ux, uy):
         for y in range(uy):
             try:
                 if aria[x, y]:
-                    pixOnGrid(surface, (x, y), cellsize, orgM, maxSz, (255, 255, 255))
+                    pixOnGrid(surface, (x, y), cellsize, orgM, maxSz, Conf["Cell_color"])
             except:
                 pass
 
@@ -98,8 +113,8 @@ def game(x, y):
     pygame.init()
     x, y = x * 10, y * 10
     surface = pygame.display.set_mode((x, y))
-    pygame.display.set_caption("John Conway's Game of Life || MarkinHaus edit")
-    cellsize = 8
+    pygame.display.set_caption("John Conway's Game of Life || MarkinHaus")
+    cellsize = Conf["Init_cell_size"]
     org = [0, 0]
     orgM = (0, 0)
     maxSz = [x, y]
@@ -129,16 +144,16 @@ def game(x, y):
                 aria[int(mx / cellsize) - orgM[0], int(my / cellsize) - orgM[1]] = 0
 
             count = 0
-            if mx <= 30:
+            if mx <= Conf["Mov_border_offset"]:
                 tblr[2] = 1
                 count = 1
-            if mx >= x - 30:
+            if mx >= x - Conf["Mov_border_offset"]:
                 tblr[3] = 1
                 count = 1
-            if my <= 30:
+            if my <= Conf["Mov_border_offset"]:
                 tblr[0] = 1
                 count = 1
-            if my >= y - 30:
+            if my >= y - Conf["Mov_border_offset"]:
                 tblr[1] = 1
                 count = 1
 
@@ -161,39 +176,32 @@ def game(x, y):
                 if pygame.key.get_pressed()[pygame.K_w]:
                     tog = not tog
 
-                if pygame.key.get_pressed()[pygame.K_w]:
-                    sblock = not tog
-
-                if pygame.key.get_pressed()[pygame.K_3]:
+                if pygame.key.get_pressed()[pygame.K_d]:
                     del aria
                     aria = genArea(int(x / 2), int(y / 2))
                     print("=" * 20)
                     print("del")
-                if pygame.key.get_pressed()[pygame.K_2]:
+                if pygame.key.get_pressed()[pygame.K_s]:
                     tog = False
                     print("=" * 20)
                     print("Saving")
-                    # l = [(0,0), (0,1), (0,-1)]
-                    # a = str(list(map(getPosTrans(center), aria)))
-                    # z = eval(str(list(map(getPosTrans2abs(center), aria))))
-                    # print(l, a, z)
-                    pickle.dump(aria, open("Maps/map", "wb"))
+                    pickle.dump(aria, open(Conf['Map_data'], "wb"))
 
-                if pygame.key.get_pressed()[pygame.K_1]:
+                if pygame.key.get_pressed()[pygame.K_l]:
                     tog = False
                     print("=" * 20)
-                    print("Loding")
-                    aria = pickle.load(open("Maps/map", "rb"))
+                    print("Loading")
+                    aria = pickle.load(open(Conf['Map_data'], "rb"))
 
                 if pygame.key.get_pressed()[pygame.K_q]:
                     orgM = [0, 0]
                 if pygame.key.get_pressed()[pygame.K_e]:
-                    cellsize = 8
+                    cellsize = Conf["Init_cell_size"]
                     mv = int(1 / (30 - cellsize))
                     if cellsize >= 8:
                         mv = 1
 
-        if movFps % int(50 / mv) == 0:
+        if movFps % int(Conf["Mov_fps_div_cell_size"] / mv) == 0:
             if tblr[1] == 1:
                 org = [org[0], org[1] - 1]
             if tblr[3] == 1:
@@ -203,10 +211,10 @@ def game(x, y):
             if tblr[2] == 1:
                 org = [org[0] + 1, org[1]]
 
-        if movFps % (2 + cellsize) == 0:
+        if movFps % (Conf["World_fps_cap"] + cellsize) == 0:
             orgM = (org[0] + orgM[0], org[1] + orgM[1])
         movFps += 1
-        surface.fill((20, 20, 30))
+        surface.fill(Conf["BG_color"])
         drawGrid(surface, maxSz, cellsize)
         if tog:
             aria = setNewState(int(x / cellsize), int(y / cellsize), aria)
@@ -216,4 +224,22 @@ def game(x, y):
 
 
 if __name__ == "__main__":
-    game(120, 90)
+    print("=" * 20)
+    try:
+        Conf = eval(open("conf", "r").read())
+        print("CONF:")
+        print(f"World_xy = {Conf['World_xy']} \n"
+              f"Mov_fps_div_cell_size = {Conf['Mov_fps_div_cell_size']} \n"
+              f"World_fps_cap = {Conf['World_fps_cap']} \n"
+              f"BG_color = {Conf['BG_color']} \n"
+              f"Cell_color = {Conf['Cell_color']} \n"
+              f"Mov_border_color = {Conf['Mov_border_color']} \n"
+              f"Mov_border_offset = {Conf['Mov_border_offset']} \n"
+              f"Border_color = {Conf['Border_color']} \n"
+              f"Init_cell_size = {Conf['Init_cell_size']} \n"
+              f"Map_data = {Conf['Map_data']}")
+    except FileExistsError and FileNotFoundError and KeyError and SyntaxError:
+        Conf = Conf_default
+        print("DEFAULT Wars")
+    print("=" * 20)
+    game(Conf["World_xy"][0], Conf["World_xy"][1])
